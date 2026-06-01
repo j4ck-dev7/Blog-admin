@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Comment {
+  id           String   @id @db.VarChar(30)
+  post         String
+  userName     String
+  userId       String
+  articleSlug  String
+  creationDate DateTime @default(now())
+  User         User     @relation(fields: [userName], references: [name])
+
+  @@index([articleSlug])
+}
+
+model Like {
+  id          String   @id @db.VarChar(30)
+  articleSlug String
+  userId      String
+  dateCreated DateTime @default(now())
+
+  @@index([articleSlug])
+}
+
+model User {
+  id                    String             @id @db.VarChar(30)
+  name                  String             @unique @db.VarChar(50)
+  email                 String             @unique @db.VarChar(50)
+  password              String?            @db.VarChar(100)
+  role                  Role               @default(user)
+  createdAt             DateTime           @default(now())
+  subscriptionPlan      SubscriptionPlan   @default(free)
+  subscriptionExpiresAt DateTime?
+  sub                   String?            @unique @db.VarChar(50)
+  authenticationType    AuthenticationType @default(local)
+  isEmailVerified       Boolean            @default(false)
+  status                Status             @default(pending)
+  Comment               Comment[]
+
+  @@index([email])
+  @@index([name])
+  @@index([sub])
+}
+
+enum AuthenticationType {
+  google
+  local
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum Status {
+  pending
+  active
+  blocked
+}
+
+enum SubscriptionPlan {
+  free
+  basic
+  intermediate
+  premium
+}
+
+enum AuditAction {
+  ADMIN_ADD
+  ADMIN_UPDATE
+  ADMIN_DELETE
+  ADMIN_LOGIN
+  ADMIN_LOGOUT
+  SYSTEM_CHANGE
+}
+
+model Audit {
+  id          String       @id @default(uuid()) @db.Uuid
+  action      AuditAction
+  actorId     String?      @db.VarChar(30)
+  actorName   String?      @db.VarChar(50)
+  actorEmail  String?      @db.VarChar(100)
+  actorRole   Role?
+  targetType  String?      @db.VarChar(100)
+  targetId    String?      @db.VarChar(30)
+  description String?      @db.Text
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+
+  @@index([action])
+  @@index([actorId])
+  @@index([createdAt])
+}
