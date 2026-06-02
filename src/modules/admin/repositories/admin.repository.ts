@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../database/prisma/prisma.service';
-import { IAdminRepository } from './admin.repository.interface';
-import { User, Prisma } from "../../../../generated/prisma/client";
+import { PrismaService } from '../../../database/prisma/prisma.service.js';
+import { IAdminRepository } from './admin.repository.interface.js';
+import { User, Prisma } from '../../../../generated/prisma/client.js';
 
 @Injectable()
 // implements é usada para garantir que uma classe adote a estrutura definida por uma interface.

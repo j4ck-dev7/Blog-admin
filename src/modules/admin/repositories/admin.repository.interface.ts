@@ -1,4 +1,4 @@
-import { User, Prisma } from "../../../../generated/prisma/client";
+import type { User, Prisma } from "../../../../generated/prisma/client.js";
 
 export interface IAdminRepository {
     create(data: Prisma.UserCreateInput) : Promise<User>;

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuditRepository } from './audit.repository';
-import { AuditService } from './audit.service';
+import { AuditRepository } from './audit.repository.js';
+import { AuditService } from './audit.service.js';
 
 @Module({
   imports: [ConfigModule],

@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { WinstonModule } from 'nest-winston';
-import { AuditModule } from './modules/audit/audit.module';
-import { loggerConfig } from './config/logger';
+import { AuditModule } from './modules/audit/audit.module.js';
+import { loggerConfig } from './config/logger.js';
 
 @Module({
   imports: [

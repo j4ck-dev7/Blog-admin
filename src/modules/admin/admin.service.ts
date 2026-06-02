@@ -1,7 +1,7 @@
 // src/modules/user/services/user.service.ts
 import { Injectable } from '@nestjs/common';
-import type { IAdminRepository } from './repositories/admin.repository.interface';
-import { Prisma } from '../../../generated/prisma/client';
+import type { IAdminRepository } from './repositories/admin.repository.interface.js';
+import { Prisma } from '../../../generated/prisma/client.js';
 
 @Injectable()
 export class adminService {

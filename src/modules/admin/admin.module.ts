@@ -1,8 +1,8 @@
 // user.module.ts
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../../database/prisma/prisma.service';
-import { adminRepository } from './repositories/admin.repository';
-import { adminService } from './admin.service';
+import { PrismaService } from '../../database/prisma/prisma.service.js';
+import { adminRepository } from './repositories/admin.repository.js';
+import { adminService } from './admin.service.js';
 
 @Module({
   providers: [
