@@ -37,6 +37,7 @@
     "connect-redis": "^7.1.0",
     "dotenv": "^17.4.2",
     "express-session": "^1.19.0",
+    "isomorphic-dompurify": "^3.15.0",
     "nest-winston": "^1.10.2",
     "nestjs-joi": "^1.12.0",
     "nodemailer": "^8.0.9",
