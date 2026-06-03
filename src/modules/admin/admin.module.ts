@@ -1,18 +1,15 @@
-// user.module.ts
 import { Module } from '@nestjs/common';
-import { PrismaService } from '../../database/prisma/prisma.service.js';
-import { adminRepository } from './repositories/admin.repository.js';
-import { adminService } from './admin.service.js';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigModule } from '@nestjs/config';
+import { AdminService } from './admin.service.js';
+import { AdminController } from './admin.controller.js';
+import { AuditModule } from '../audit/audit.module.js';
+import { RedisClientProvider } from '../../config/redis.config.js';
 
 @Module({
-  providers: [
-    adminService,
-    {
-      provide: 'IAdminRepository',
-      useClass: adminRepository,
-    },
-    PrismaService,
-  ],
-  exports: [adminService],
+  imports: [MailerModule, ConfigModule, AuditModule],
+  controllers: [AdminController],
+  providers: [AdminService, RedisClientProvider],
 })
-export class adminModule {}
+
+export class AdminModule {}

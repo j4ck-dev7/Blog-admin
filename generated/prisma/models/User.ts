@@ -313,7 +313,7 @@ export type UserScalarWhereWithAggregatesInput = {
 }
 
 export type UserCreateInput = {
-  id: string
+  id?: string
   name: string
   email: string
   password?: string | null
@@ -329,7 +329,7 @@ export type UserCreateInput = {
 }
 
 export type UserUncheckedCreateInput = {
-  id: string
+  id?: string
   name: string
   email: string
   password?: string | null
@@ -377,7 +377,7 @@ export type UserUncheckedUpdateInput = {
 }
 
 export type UserCreateManyInput = {
-  id: string
+  id?: string
   name: string
   email: string
   password?: string | null
@@ -514,7 +514,7 @@ export type EnumStatusFieldUpdateOperationsInput = {
 }
 
 export type UserCreateWithoutCommentInput = {
-  id: string
+  id?: string
   name: string
   email: string
   password?: string | null
@@ -529,7 +529,7 @@ export type UserCreateWithoutCommentInput = {
 }
 
 export type UserUncheckedCreateWithoutCommentInput = {
-  id: string
+  id?: string
   name: string
   email: string
   password?: string | null

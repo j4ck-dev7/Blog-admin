@@ -16,6 +16,12 @@ export const createRedisClient = (config: ConfigService): RedisClientType => {
   return client;
 }
 
+export const RedisClientProvider = {
+  provide: 'REDIS_CLIENT',
+  useFactory: (config: ConfigService) => createRedisClient(config),
+  inject: [ConfigService],
+};
+
 export const getRedisConnectionOptions = (config: ConfigService) => {
   return {
     url: config.get('REDIS_URL') ?? 'redis://127.0.0.1:6379',

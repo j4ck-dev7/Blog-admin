@@ -57,6 +57,11 @@ export type Like = Prisma.LikeModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model Invite
+ * 
+ */
+export type Invite = Prisma.InviteModel
+/**
  * Model Audit
  * 
  */

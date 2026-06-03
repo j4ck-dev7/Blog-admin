@@ -29,10 +29,11 @@ model Like {
 }
 
 model User {
-  id                    String             @id @db.VarChar(30)
+  id                    String             @id @default(uuid()) @db.VarChar(30)
   name                  String             @unique @db.VarChar(50)
   email                 String             @unique @db.VarChar(50)
   password              String?            @db.VarChar(100)
+  mfaSecret             String?            @db.VarChar(200)
   role                  Role               @default(user)
   createdAt             DateTime           @default(now())
   subscriptionPlan      SubscriptionPlan   @default(free)
@@ -69,6 +70,28 @@ enum SubscriptionPlan {
   basic
   intermediate
   premium
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+model Invite {
+  id          String     @id @default(uuid()) @db.Uuid
+  email       String     @db.VarChar(100)
+  senderId    String?    @db.VarChar(30)
+  senderName  String?    @db.VarChar(50)
+  senderEmail String?    @db.VarChar(100)
+  sentAt      DateTime   @default(now())
+  acceptedAt  DateTime?
+  status      InviteStatus @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([email])
+  @@index([senderId])
 }
 
 enum AuditAction {

@@ -54,6 +54,7 @@ export const ModelName = {
   Comment: 'Comment',
   Like: 'Like',
   User: 'User',
+  Invite: 'Invite',
   Audit: 'Audit'
 } as const
 
@@ -111,6 +112,22 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const InviteScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  senderId: 'senderId',
+  senderName: 'senderName',
+  senderEmail: 'senderEmail',
+  sentAt: 'sentAt',
+  acceptedAt: 'acceptedAt',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InviteScalarFieldEnum = (typeof InviteScalarFieldEnum)[keyof typeof InviteScalarFieldEnum]
 
 
 export const AuditScalarFieldEnum = {

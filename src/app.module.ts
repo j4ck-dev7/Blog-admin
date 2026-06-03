@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { WinstonModule } from 'nest-winston';
 import { AuditModule } from './modules/audit/audit.module.js';
+import { AdminModule } from './modules/admin/admin.module.js';
 import { loggerConfig } from './config/logger.js';
 
 @Module({
@@ -31,6 +32,7 @@ import { loggerConfig } from './config/logger.js';
     }),
     MongooseModule.forRoot(process.env.MONGO_CONNECT!),
     AuditModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [],

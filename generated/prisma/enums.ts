@@ -44,6 +44,15 @@ export const SubscriptionPlan = {
 export type SubscriptionPlan = (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan]
 
 
+export const InviteStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus]
+
+
 export const AuditAction = {
   ADMIN_ADD: 'ADMIN_ADD',
   ADMIN_UPDATE: 'ADMIN_UPDATE',
