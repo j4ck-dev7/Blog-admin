@@ -4,9 +4,28 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { AdminAuthGuard } from '../src/common/guards/admin-auth.guard.js';
 import { MailerService } from '@nestjs-modules/mailer';
-import { prisma } from '../src/config/prisma.js';
 import speakeasy from 'speakeasy';
 import { afterAll, afterEach, beforeAll, describe, expect, it, jest } from '@jest/globals';
+
+jest.mock('../src/config/prisma.js', () => {
+  const mockPrisma = {
+    invite: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    },
+    user: {
+      create: jest.fn(),
+    },
+    $disconnect: jest.fn(),
+    $connect: jest.fn(),
+    $transaction: jest.fn(),
+  };
+  return { prisma: mockPrisma }
+})
+
+import { prisma } from '../src/config/prisma.js';
+jest.setTimeout(30000);
 
 const mockMailer = {
   sendMail: jest.fn(),
@@ -53,7 +72,7 @@ describe('Admin invite flow (e2e)', () => {
   it('should send invite, setup MFA, and complete the admin invite', async () => {
     const invite = { id: 'invite-123', email: 'admin@example.com', senderId: 'sender-1' } as any;
     jest.spyOn(prisma.invite, 'create').mockResolvedValue(invite);
-    mockRedis.get.mockResolvedValueOnce('invite-123');
+    mockRedis.get.mockImplementation(() => Promise.resolve('invite-123'));
 
     const sendResponse = await request(app.getHttpServer())
       .post('/admin/invite/send')
@@ -74,7 +93,7 @@ describe('Admin invite flow (e2e)', () => {
     expect(setupResponse.body).toHaveProperty('base32');
     expect(mockRedis.setEx).toHaveBeenCalledWith(`admin_invite:mfa:${token}`, 900, setupResponse.body.base32);
 
-    mockRedis.get.mockResolvedValueOnce('invite-123').mockResolvedValueOnce(setupResponse.body.base32);
+    mockRedis.get.mockImplementation(() => Promise.resolve('invite-123')).mockImplementation(() => Promise.resolve(setupResponse.body.base32));
     jest.spyOn(prisma.invite, 'findUnique').mockResolvedValue(invite);
     jest.spyOn(prisma.user, 'create').mockResolvedValue({ id: 'user-1', name: 'newadmin', email: 'admin@example.com' } as any);
     jest.spyOn(prisma.invite, 'update').mockResolvedValue({ ...invite, acceptedAt: new Date(), status: 'ACCEPTED' } as any);

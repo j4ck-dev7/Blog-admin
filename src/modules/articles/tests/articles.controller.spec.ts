@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { jest } from '@jest/globals';
 import { ArticleController } from '../articles.controller.js';
 import { ArticleService } from '../articles.service.js';
-import { CreateArticleDto, UpdateArticleDto } from '../dtos/index.js';
+import { CreateArticleDto } from '../dtos/create-article.dto.js';
+import { UpdateArticleDto } from '../dtos/update-article.dto.js';
 import { NotFoundException } from '@nestjs/common';
 
 describe('ArticleController', () => {
@@ -47,6 +49,10 @@ describe('ArticleController', () => {
           provide: ArticleService,
           useValue: mockService,
         },
+        {
+          provide: 'REDIS_CLIENT',
+          useValue: {},
+        },
       ],
     }).compile();
 
@@ -67,7 +73,7 @@ describe('ArticleController', () => {
         tags: ['test'],
       };
 
-      mockService.create.mockResolvedValue(mockArticle);
+      mockService.create.mockImplementation(() => Promise.resolve(mockArticle));
 
       const result = await controller.create(createDto);
 
@@ -88,7 +94,7 @@ describe('ArticleController', () => {
         },
       };
 
-      mockService.findAll.mockResolvedValue(expected);
+      mockService.findAll.mockImplementation(() => Promise.resolve(expected));   
 
       const result = await controller.findAll(1, 10);
 
@@ -97,10 +103,12 @@ describe('ArticleController', () => {
     });
 
     it('should use default pagination values', async () => {
-      mockService.findAll.mockResolvedValue({
+      const expected = {
         data: [],
         pagination: { page: 1, limit: 10, total: 0, pages: 0 },
-      });
+      };
+
+      mockService.findAll.mockImplementation(() => Promise.resolve(expected));
 
       await controller.findAll(undefined, undefined);
 
@@ -110,7 +118,7 @@ describe('ArticleController', () => {
 
   describe('findById', () => {
     it('should return article by id', async () => {
-      mockService.findById.mockResolvedValue(mockArticle);
+      mockService.findById.mockImplementation(() => Promise.resolve(mockArticle));
 
       const result = await controller.findById('507f1f77bcf86cd799439011');
 
@@ -126,7 +134,7 @@ describe('ArticleController', () => {
         pagination: { page: 1, limit: 10, total: 1, pages: 1 },
       };
 
-      mockService.findByTags.mockResolvedValue(expected);
+      mockService.findByTags.mockImplementation(() => Promise.resolve(expected));
 
       const result = await controller.findByTags('test,article', 1, 10);
 
@@ -146,7 +154,7 @@ describe('ArticleController', () => {
         pagination: { page: 1, limit: 10, total: 1, pages: 1 },
       };
 
-      mockService.findByPlanRole.mockResolvedValue(expected);
+      mockService.findByPlanRole.mockImplementation(() => Promise.resolve(expected));
 
       const result = await controller.findByPlanRole('free', 1, 10);
 
@@ -160,7 +168,7 @@ describe('ArticleController', () => {
       const updateDto: UpdateArticleDto = { title: 'Updated Title' };
       const updated = { ...mockArticle, ...updateDto };
 
-      mockService.updateById.mockResolvedValue(updated);
+      mockService.updateById.mockImplementation(() => Promise.resolve(updated));
 
       const result = await controller.update('507f1f77bcf86cd799439011', updateDto);
 
@@ -171,7 +179,7 @@ describe('ArticleController', () => {
 
   describe('delete', () => {
     it('should delete an article', async () => {
-      mockService.deleteById.mockResolvedValue(mockArticle);
+      mockService.deleteById.mockImplementation(() => Promise.resolve(mockArticle));
 
       const result = await controller.delete('507f1f77bcf86cd799439011');
 
@@ -184,7 +192,7 @@ describe('ArticleController', () => {
     const id = '507f1f77bcf86cd799439011';
 
     it('should increment view count', async () => {
-      mockService.incrementViewCount.mockResolvedValue(undefined);
+      mockService.incrementViewCount.mockImplementation(() => Promise.resolve(undefined));
 
       const result = await controller.incrementViewCount(id);
 
@@ -193,7 +201,7 @@ describe('ArticleController', () => {
     });
 
     it('should increment like count', async () => {
-      mockService.incrementLikeCount.mockResolvedValue(undefined);
+      mockService.incrementLikeCount.mockImplementation(() => Promise.resolve(undefined));
 
       const result = await controller.incrementLikeCount(id);
 
@@ -202,7 +210,7 @@ describe('ArticleController', () => {
     });
 
     it('should decrement like count', async () => {
-      mockService.decrementLikeCount.mockResolvedValue(undefined);
+      mockService.decrementLikeCount.mockImplementation(() => Promise.resolve(undefined));
 
       const result = await controller.decrementLikeCount(id);
 
@@ -211,7 +219,7 @@ describe('ArticleController', () => {
     });
 
     it('should increment comment count', async () => {
-      mockService.incrementCommentCount.mockResolvedValue(undefined);
+      mockService.incrementCommentCount.mockImplementation(() => Promise.resolve(undefined));
 
       const result = await controller.incrementCommentCount(id);
 
@@ -220,7 +228,7 @@ describe('ArticleController', () => {
     });
 
     it('should decrement comment count', async () => {
-      mockService.decrementCommentCount.mockResolvedValue(undefined);
+      mockService.decrementCommentCount.mockImplementation(() => Promise.resolve(undefined));
 
       const result = await controller.decrementCommentCount(id);
 

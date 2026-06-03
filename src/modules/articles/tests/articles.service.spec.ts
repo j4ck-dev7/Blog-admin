@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { jest } from '@jest/globals';
 import { ArticleService } from '../articles.service.js';
 import { ArticleRepository } from '../articles.repository.js';
-import { CreateArticleDto, UpdateArticleDto } from '../dtos/index.js';
+import { CreateArticleDto } from '../dtos/create-article.dto.js';
+import { UpdateArticleDto } from '../dtos/update-article.dto.js';
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 
 describe('ArticleService', () => {
@@ -70,8 +72,8 @@ describe('ArticleService', () => {
         planRole: 'free',
       };
 
-      mockRepository.findBySlug.mockResolvedValue(null);
-      mockRepository.create.mockResolvedValue(mockArticle);
+      mockRepository.findBySlug.mockImplementation(() => Promise.resolve(null));
+      mockRepository.create.mockImplementation(() => Promise.resolve(mockArticle));
 
       const result = await service.create(createDto);
 
@@ -90,7 +92,7 @@ describe('ArticleService', () => {
         tags: ['test'],
       };
 
-      mockRepository.findBySlug.mockResolvedValue(mockArticle);
+      mockRepository.findBySlug.mockImplementation(() => Promise.resolve(mockArticle));
 
       await expect(service.create(createDto)).rejects.toThrow(ConflictException);
       expect(mockRepository.create).not.toHaveBeenCalled();
@@ -100,7 +102,7 @@ describe('ArticleService', () => {
   describe('findById', () => {
     it('should return article by id', async () => {
       const id = '507f1f77bcf86cd799439011';
-      mockRepository.findById.mockResolvedValue(mockArticle);
+      mockRepository.findById.mockImplementation(() => Promise.resolve(mockArticle));
 
       const result = await service.findById(id);
 
@@ -110,7 +112,7 @@ describe('ArticleService', () => {
 
     it('should throw NotFoundException when article does not exist', async () => {
       const id = '507f1f77bcf86cd799439012';
-      mockRepository.findById.mockResolvedValue(null);
+      mockRepository.findById.mockImplementation(() => Promise.resolve(null));
 
       await expect(service.findById(id)).rejects.toThrow(NotFoundException);
     });
@@ -119,7 +121,7 @@ describe('ArticleService', () => {
   describe('findBySlug', () => {
     it('should return article by slug', async () => {
       const slug = 'test-article';
-      mockRepository.findBySlug.mockResolvedValue(mockArticle);
+      mockRepository.findBySlug.mockImplementation(() => Promise.resolve(mockArticle));
 
       const result = await service.findBySlug(slug);
 
@@ -129,7 +131,7 @@ describe('ArticleService', () => {
 
     it('should throw NotFoundException when article does not exist', async () => {
       const slug = 'non-existent';
-      mockRepository.findBySlug.mockResolvedValue(null);
+      mockRepository.findBySlug.mockImplementation(() => Promise.resolve(null));
 
       await expect(service.findBySlug(slug)).rejects.toThrow(NotFoundException);
     });
@@ -138,8 +140,8 @@ describe('ArticleService', () => {
   describe('findAll', () => {
     it('should return paginated articles', async () => {
       const articles = [mockArticle];
-      mockRepository.findAll.mockResolvedValue(articles);
-      mockRepository.countAll.mockResolvedValue(1);
+      mockRepository.findAll.mockImplementation(() => Promise.resolve(articles));
+      mockRepository.countAll.mockImplementation(() => Promise.resolve(1));
 
       const result = await service.findAll(1, 10);
 
@@ -150,8 +152,8 @@ describe('ArticleService', () => {
     });
 
     it('should enforce maximum limit of 100', async () => {
-      mockRepository.findAll.mockResolvedValue([]);
-      mockRepository.countAll.mockResolvedValue(0);
+      mockRepository.findAll.mockImplementation(() => Promise.resolve([]));
+      mockRepository.countAll.mockImplementation(() => Promise.resolve(0));
 
       await service.findAll(1, 200);
 
@@ -165,8 +167,8 @@ describe('ArticleService', () => {
       const updateDto: UpdateArticleDto = { title: 'Updated Title' };
       const updatedArticle = { ...mockArticle, ...updateDto };
 
-      mockRepository.findById.mockResolvedValue(mockArticle);
-      mockRepository.updateById.mockResolvedValue(updatedArticle);
+      mockRepository.findById.mockImplementation(() => Promise.resolve(mockArticle));
+      mockRepository.updateById.mockImplementation(() => Promise.resolve(updatedArticle));
 
       const result = await service.updateById(id, updateDto);
 
@@ -178,7 +180,7 @@ describe('ArticleService', () => {
       const id = '507f1f77bcf86cd799439012';
       const updateDto: UpdateArticleDto = { title: 'Updated' };
 
-      mockRepository.findById.mockResolvedValue(null);
+      mockRepository.findById.mockImplementation(() => Promise.resolve(null));
 
       await expect(service.updateById(id, updateDto)).rejects.toThrow(NotFoundException);
     });
@@ -188,8 +190,8 @@ describe('ArticleService', () => {
       const updateDto: UpdateArticleDto = { slug: 'existing-slug' };
       const existingArticle = { ...mockArticle, _id: '507f1f77bcf86cd799439012' };
 
-      mockRepository.findById.mockResolvedValue(mockArticle);
-      mockRepository.findBySlug.mockResolvedValue(existingArticle);
+      mockRepository.findById.mockImplementation(() => Promise.resolve(mockArticle));
+      mockRepository.findBySlug.mockImplementation(() => Promise.resolve(existingArticle));
 
       await expect(service.updateById(id, updateDto)).rejects.toThrow(ConflictException);
     });
@@ -199,8 +201,8 @@ describe('ArticleService', () => {
     it('should delete article successfully', async () => {
       const id = '507f1f77bcf86cd799439011';
 
-      mockRepository.findById.mockResolvedValue(mockArticle);
-      mockRepository.deleteById.mockResolvedValue(mockArticle);
+      mockRepository.findById.mockImplementation(() => Promise.resolve(mockArticle));
+      mockRepository.deleteById.mockImplementation(() => Promise.resolve(mockArticle));
 
       const result = await service.deleteById(id);
 
@@ -211,7 +213,7 @@ describe('ArticleService', () => {
     it('should throw NotFoundException when article does not exist', async () => {
       const id = '507f1f77bcf86cd799439012';
 
-      mockRepository.findById.mockResolvedValue(null);
+      mockRepository.findById.mockImplementation(() => Promise.resolve(null));
 
       await expect(service.deleteById(id)).rejects.toThrow(NotFoundException);
     });
@@ -220,7 +222,7 @@ describe('ArticleService', () => {
   describe('findByTags', () => {
     it('should return articles filtered by tags', async () => {
       const tags = ['test'];
-      mockRepository.findByTags.mockResolvedValue([mockArticle]);
+      mockRepository.findByTags.mockImplementation(() => Promise.resolve([mockArticle]));
 
       const result = await service.findByTags(tags);
 
@@ -238,7 +240,7 @@ describe('ArticleService', () => {
   describe('findByPlanRole', () => {
     it('should return articles filtered by plan role', async () => {
       const planRole = 'free';
-      mockRepository.findByPlanRole.mockResolvedValue([mockArticle]);
+      mockRepository.findByPlanRole.mockImplementation(() => Promise.resolve([mockArticle]));
 
       const result = await service.findByPlanRole(planRole);
 

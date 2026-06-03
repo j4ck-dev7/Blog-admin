@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { WinstonModule } from 'nest-winston';
 import { AuditModule } from './modules/audit/audit.module.js';
+import { AppController } from './app.controller.js';
 import { AdminModule } from './modules/admin/admin.module.js';
 import { loggerConfig } from './config/logger.js';
 
@@ -34,7 +35,7 @@ import { loggerConfig } from './config/logger.js';
     AuditModule,
     AdminModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 
