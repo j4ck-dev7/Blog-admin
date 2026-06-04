@@ -15,9 +15,9 @@ describe('AdminService', () => {
   let mockRedis: any;
 
   beforeEach(() => {
-    mockMailer = { sendMail: jest.fn() };
+    mockMailer = { sendMail: jest.fn() } as Partial<MailerService>;
     mockConfig = { get: jest.fn((key: string) => (key === 'APP_URL' ? 'http://localhost:5000' : undefined)) };
-    mockAudit = { record: jest.fn() };
+    mockAudit = { record: jest.fn() } as Partial<AuditService>;
     mockRedis = {
       get: jest.fn(),
       setEx: jest.fn(),
@@ -79,7 +79,7 @@ describe('AdminService', () => {
       .mockResolvedValueOnce('invite-123')
       .mockResolvedValueOnce('JBSWY3DPEHPK3PXP');
     jest.spyOn(prisma.invite, 'findUnique').mockResolvedValue(invite);
-    jest.spyOn(prisma.user, 'create').mockImplementation(async ({ data }) => ({ id: 'user-1', ...data } as any));
+    jest.spyOn(prisma.user, 'create').mockResolvedValue({ id: 'user-1' } as any);
     jest.spyOn(prisma.invite, 'update').mockResolvedValue({ ...invite, acceptedAt: new Date(), status: 'ACCEPTED' } as any);
 
     const totp = speakeasy.totp({ secret: 'JBSWY3DPEHPK3PXP', encoding: 'base32' });

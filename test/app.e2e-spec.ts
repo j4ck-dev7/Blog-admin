@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
-import { jest } from '@jest/globals';
+import { jest, it, describe, beforeEach, afterEach } from '@jest/globals';
 
 jest.setTimeout(30000);
 
