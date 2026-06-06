@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module.js';
+import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import session from 'express-session';
 import { ConfigService } from '@nestjs/config';
-import { createSessionOptions } from './config/session.config.js';
+import { createSessionOptions } from './config/session.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

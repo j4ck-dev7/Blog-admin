@@ -1,5 +1,5 @@
-import { AuthService } from '../auth.service.js';
-import { prisma } from '../../../config/prisma.js';
+import { AuthService } from '../auth.service';
+import { prisma } from '../../../config/prisma';
 import { beforeEach, afterEach, describe, expect, it, jest } from '@jest/globals';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 

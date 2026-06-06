@@ -1,8 +1,8 @@
 import { Injectable, Logger, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
-import { ArticleRepository } from './articles.repository.js';
-import type { CreateArticleDto } from './dtos/create-article.dto.js';
-import type { UpdateArticleDto } from './dtos/update-article.dto.js';
-import type { ArticleDocument } from './schemas/article.schema.js';
+import { ArticleRepository } from './articles.repository';
+import type { CreateArticleDto } from './dtos/create-article.dto';
+import type { UpdateArticleDto } from './dtos/update-article.dto';
+import type { ArticleDocument } from './schemas/article.schema';
 
 @Injectable()
 export class ArticleService {

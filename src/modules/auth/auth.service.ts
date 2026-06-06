@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { prisma } from '../../config/prisma.js';
-import { verifyPassword } from '../../config/argon2.config.js';
-import { TokenService } from './token.service.js';
+import { prisma } from '../../config/prisma';
+import { verifyPassword } from '../../config/argon2.config';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {

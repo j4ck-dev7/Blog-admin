@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import type { RedisClientType } from 'redis';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class TokenService {
   ) {}
 
   async generatePair(userId: string, role: string) {
-    const jti = uuidv4();
+    const jti = randomUUID();
     const accessSecret = this.config.get('JWT_ACCESS_SECRET') || this.config.get('JWT_SECRET') || 'change_me';
     const refreshSecret = this.config.get('JWT_REFRESH_SECRET') || this.config.get('JWT_SECRET') || 'change_me';
 

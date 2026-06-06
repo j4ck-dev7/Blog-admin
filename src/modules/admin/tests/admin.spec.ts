@@ -1,8 +1,8 @@
-import { AdminService } from '../admin.service.js';
-import { prisma } from '../../../config/prisma.js';
+import { AdminService } from '../admin.service';
+import { prisma } from '../../../config/prisma';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { AuditService } from '../../audit/audit.service.js';
+import { AuditService } from '../../audit/audit.service';
 import { BadRequestException } from '@nestjs/common';
 import { beforeEach, afterEach, describe, expect, it, jest } from '@jest/globals';
 import speakeasy from 'speakeasy';
@@ -79,7 +79,7 @@ describe('AdminService', () => {
       .mockResolvedValueOnce('invite-123')
       .mockResolvedValueOnce('JBSWY3DPEHPK3PXP');
     jest.spyOn(prisma.invite, 'findUnique').mockResolvedValue(invite);
-    jest.spyOn(prisma.user, 'create').mockResolvedValue({ id: 'user-1' } as any);
+    jest.spyOn(prisma.user, 'create').mockResolvedValue({ email: 'admin@example.com', id: 'user-1', name: 'newadmin' } as any);
     jest.spyOn(prisma.invite, 'update').mockResolvedValue({ ...invite, acceptedAt: new Date(), status: 'ACCEPTED' } as any);
 
     const totp = speakeasy.totp({ secret: 'JBSWY3DPEHPK3PXP', encoding: 'base32' });
@@ -87,7 +87,7 @@ describe('AdminService', () => {
 
     const result = await adminService.completeInvite('token-123', 'newadmin', 'Password123!', totp, req);
 
-    expect(result).toEqual(expect.objectContaining({ id: 'user-1', email: 'admin@example.com', name: 'newadmin' }));
+    expect(result).toMatchObject({ email: 'admin@example.com', id: 'user-1', name: 'newadmin' });
     expect(req.session).toMatchObject({ userId: 'user-1', role: 'admin', email: 'admin@example.com', name: 'newadmin' });
     expect(mockRedis.del).toHaveBeenCalledWith('admin_invite:token-123');
     expect(mockRedis.del).toHaveBeenCalledWith('admin_invite:mfa:token-123');

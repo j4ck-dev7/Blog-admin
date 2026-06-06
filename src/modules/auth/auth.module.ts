@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AuthController } from './auth.controller.js';
-import { AuthService } from './auth.service.js';
-import { TokenService } from './token.service.js';
-import { AuthRateLimitGuard } from './guards/rate-limit.guard.js';
-import { RedisClientProvider } from '../../config/redis.config.js';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { TokenService } from './token.service';
+import { AuthRateLimitGuard } from './guards/rate-limit.guard';
+import { RedisClientProvider } from '../../config/redis.config';
 
 @Module({
   imports: [ConfigModule],

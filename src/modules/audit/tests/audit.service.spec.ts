@@ -1,4 +1,4 @@
-import { AuditService, AuditActionType } from '../audit.service.js';
+import { AuditService, AuditActionType } from '../audit.service';
 import { beforeEach, afterEach, describe, expect, it, jest } from '@jest/globals';
 
 describe('AuditService', () => {

@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
-import { ArticleService } from '../articles.service.js';
-import { ArticleRepository } from '../articles.repository.js';
-import { CreateArticleDto } from '../dtos/create-article.dto.js';
-import { UpdateArticleDto } from '../dtos/update-article.dto.js';
+import { ArticleService } from '../articles.service';
+import { ArticleRepository } from '../articles.repository';
+import { CreateArticleDto } from '../dtos/create-article.dto';
+import { UpdateArticleDto } from '../dtos/update-article.dto';
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 
 describe('ArticleService', () => {

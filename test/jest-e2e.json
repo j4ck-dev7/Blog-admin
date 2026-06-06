@@ -1,13 +1,34 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "moduleFileExtensions": [
+    "ts",
+    "js",
+    "json"
+  ],
   "testEnvironment": "node",
-  "testRegex": ".e2e-spec.ts$",
+  "setupFilesAfterEnv": [
+    "<rootDir>/jest-e2e-setup.ts"
+  ],
+  "testMatch": [
+    "**/*.e2e-spec.ts"
+  ],
+  "extensionsToTreatAsEsm": [
+    ".ts"
+  ],
   "transform": {
-    "^.+\\.ts$": ["ts-jest", { "useESM": true, "tsconfig": "tsconfig.json" }]
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        "useESM": true,
+        "tsconfig": "tsconfig.json"
+      }
+    ]
   },
-  "extensionsToTreatAsEsm": [".ts"],
+  "transformIgnorePatterns": [
+    "node_modules/(?!(isomorphic-dompurify)/)"
+  ],
+  "testTimeout": 30000,
   "moduleNameMapper": {
-    "^(\\.{1,2}/.*)\\.js$": "$1"
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+    "^isomorphic-dompurify$": "<rootDir>/mocks/isomorphic-dompurify.js"
   }
 }

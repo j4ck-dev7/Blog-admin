@@ -13,11 +13,11 @@ import {
   NotFoundException,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ArticleService } from './articles.service.js';
-import type { CreateArticleDto } from './dtos/create-article.dto.js';
-import type { UpdateArticleDto } from './dtos/update-article.dto.js';
-import { AdminAuthGuard } from '../../common/guards/admin-auth.guard.js';
-import { RateLimitGuard } from './guards/rate-limit.guard.js';
+import { ArticleService } from './articles.service';
+import type { CreateArticleDto } from './dtos/create-article.dto';
+import type { UpdateArticleDto } from './dtos/update-article.dto';
+import { AdminAuthGuard } from '../../common/guards/admin-auth.guard';
+import { RateLimitGuard } from './guards/rate-limit.guard';
 
 @Controller('articles')
 @UseGuards(RateLimitGuard)
@@ -31,7 +31,7 @@ export class ArticleController {
    * Criar um novo artigo
    * Requer: Admin, Rate Limit
    */
-  @Post()
+  @Post('/create')
   @UseGuards(AdminAuthGuard)
   async create(@Body(new ValidationPipe({ transform: true })) createArticleDto: CreateArticleDto) {
     this.logger.log(`[POST] Criando novo artigo: ${createArticleDto.title}`);

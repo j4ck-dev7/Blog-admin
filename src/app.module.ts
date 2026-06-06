@@ -3,10 +3,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { WinstonModule } from 'nest-winston';
-import { AuditModule } from './modules/audit/audit.module.js';
-import { AppController } from './app.controller.js';
-import { AdminModule } from './modules/admin/admin.module.js';
-import { loggerConfig } from './config/logger.js';
+import { AuditModule } from './modules/audit/audit.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { ArticleModule } from './modules/articles/articles.module';
+import { loggerConfig } from './config/logger';
+import { ArticleController } from './modules/articles/articles.controller';
+import { AuthController } from './modules/auth/auth.controller';
+import { AdminController } from './modules/admin/admin.controller';
+import { RedisClientProvider } from './config/redis.config';
 
 @Module({
   imports: [
@@ -34,9 +39,10 @@ import { loggerConfig } from './config/logger.js';
     MongooseModule.forRoot(process.env.MONGO_CONNECT!),
     AuditModule,
     AdminModule,
+    AuthModule,
+    ArticleModule,
   ],
-  controllers: [AppController],
-  providers: [],
+  controllers: [ArticleController, AuthController, AdminController],
+  providers: [RedisClientProvider],
 })
-
 export class AppModule {}

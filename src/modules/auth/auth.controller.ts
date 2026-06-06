@@ -1,7 +1,7 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
-import { AuthService } from './auth.service.js';
-import { LoginDto } from './dtos/login.dto.js';
-import { AuthRateLimitGuard } from './guards/rate-limit.guard.js';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LoginDto } from './dtos/login.dto';
+import { AuthRateLimitGuard } from './guards/rate-limit.guard';
 
 @Controller('auth')
 export class AuthController {

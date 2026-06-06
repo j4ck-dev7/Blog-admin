@@ -275,11 +275,11 @@ export type EnumRoleNullableFilter<$PrismaModel = never> = {
 }
 
 export type JsonNullableFilter<$PrismaModel = never> =
- Prisma.PatchUndefined<
+| Prisma.PatchUndefined<
     Prisma.Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
     Required<JsonNullableFilterBase<$PrismaModel>>
   >
- Prisma.OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+| Prisma.OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
 export type JsonNullableFilterBase<$PrismaModel = never> = {
   equals?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
@@ -319,11 +319,11 @@ export type EnumRoleNullableWithAggregatesFilter<$PrismaModel = never> = {
 }
 
 export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
- Prisma.PatchUndefined<
+| Prisma.PatchUndefined<
     Prisma.Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
     Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
   >
- Prisma.OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+| Prisma.OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
 export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
   equals?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
@@ -637,11 +637,11 @@ export type NestedEnumRoleNullableWithAggregatesFilter<$PrismaModel = never> = {
 }
 
 export type NestedJsonNullableFilter<$PrismaModel = never> =
- Prisma.PatchUndefined<
+| Prisma.PatchUndefined<
     Prisma.Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
     Required<NestedJsonNullableFilterBase<$PrismaModel>>
   >
- Prisma.OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+| Prisma.OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
 
 export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
   equals?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter

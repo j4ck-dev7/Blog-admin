@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { prisma } from '../../config/prisma.js';
+import { prisma } from '../../config/prisma';
 
 @Injectable()
 export class AuditRepository {

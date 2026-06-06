@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AuditRepository } from './audit.repository.js';
+import { AuditRepository } from './audit.repository';
 
 export enum AuditActionType {
   ADMIN_ADD = 'ADMIN_ADD',

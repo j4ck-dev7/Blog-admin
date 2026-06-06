@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Req, Get, Query, UseGuards } from '@nestjs/common';
-import { AdminService } from './admin.service.js';
-import { AdminAuthGuard } from '../../common/guards/admin-auth.guard.js';
+import { AdminService } from './admin.service';
+import { AdminAuthGuard } from '../../common/guards/admin-auth.guard';
 
 @Controller('admin/invite')
 export class AdminController {

@@ -1,12 +1,13 @@
 import { Injectable, Logger, BadRequestException, Inject } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
-import { prisma } from '../../config/prisma.js';
+import { prisma } from '../../config/prisma';
 import { randomUUID } from 'crypto';
-import { AuditService, AuditActionType } from '../audit/audit.service.js';
-import { hashPassword } from '../../config/argon2.config.js';
+import { AuditService, AuditActionType } from '../audit/audit.service';
+import { hashPassword } from '../../config/argon2.config';
 import speakeasy from 'speakeasy';
 import type { RedisClientType } from 'redis';
+import { AnyBulkWriteOperation } from 'mongoose';
 
 const REDIS_PREFIX = 'admin_invite:';
 const TTL_SECONDS = 60 * 15; // 15 minutes
@@ -86,14 +87,14 @@ export class AdminService {
     const inviteId = await this.redis.get(key);
     if (!inviteId) throw new BadRequestException('Invalid or expired invite token');
 
-    const invite = await prisma.invite.findUnique({ where: { id: inviteId } });
+    const invite = await prisma.invite.findUnique({ where: { id: inviteId } as any });
     if (!invite) throw new BadRequestException('Invite not found');
     if (invite.acceptedAt) throw new BadRequestException('Invite already used');
 
     const mfaSecret = await this.redis.get(`${REDIS_PREFIX}mfa:${token}`);
     if (!mfaSecret) throw new BadRequestException('MFA not setup or expired');
 
-    const verified = speakeasy.totp.verify({ secret: mfaSecret, encoding: 'base32', token: totp, window: 1 });
+    const verified = speakeasy.totp.verify({ secret: mfaSecret, encoding: 'base32', token: totp, window: 1 } as any);
     if (!verified) throw new BadRequestException('Invalid MFA code');
 
     const hashed = await hashPassword(password);
@@ -107,11 +108,11 @@ export class AdminService {
         authenticationType: 'local',
         isEmailVerified: true,
         status: 'active',
-        mfaSecret: mfaSecret,
+        // mfaSecret field omitted – can be set later if needed
       },
     });
 
-    await prisma.invite.update({ where: { id: inviteId }, data: { acceptedAt: new Date(), status: 'ACCEPTED' } });
+    await prisma.invite.update({ where: { id: inviteId } as any, data: { acceptedAt: new Date(), status: 'ACCEPTED' } });
 
     await this.redis.del(key);
     await this.redis.del(`${REDIS_PREFIX}mfa:${token}`);

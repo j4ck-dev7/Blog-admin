@@ -1,4 +1,4 @@
-import { TokenService } from '../token.service.js';
+import { TokenService } from '../token.service';
 import { beforeEach, afterEach, describe, expect, it, jest } from '@jest/globals';
 
 describe('TokenService', () => {

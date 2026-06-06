@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Article, ArticleDocument } from './schemas/article.schema.js';
-import type { CreateArticleDto } from './dtos/create-article.dto.js';
-import type { UpdateArticleDto } from './dtos/update-article.dto.js';
+import { Article, ArticleDocument } from './schemas/article.schema';
+import type { CreateArticleDto } from './dtos/create-article.dto';
+import type { UpdateArticleDto } from './dtos/update-article.dto';
 
 @Injectable()
 export class ArticleRepository {
