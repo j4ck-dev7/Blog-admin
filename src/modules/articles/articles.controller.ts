@@ -14,8 +14,8 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ArticleService } from './articles.service';
-import type { CreateArticleDto } from './dtos/create-article.dto';
-import type { UpdateArticleDto } from './dtos/update-article.dto';
+import { CreateArticleDto } from './dtos/create-article.dto';
+import { UpdateArticleDto } from './dtos/update-article.dto';
 import { AdminAuthGuard } from '../../common/guards/admin-auth.guard';
 import { RateLimitGuard } from './guards/rate-limit.guard';
 

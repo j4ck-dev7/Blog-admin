@@ -8,9 +8,6 @@ import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ArticleModule } from './modules/articles/articles.module';
 import { loggerConfig } from './config/logger';
-import { ArticleController } from './modules/articles/articles.controller';
-import { AuthController } from './modules/auth/auth.controller';
-import { AdminController } from './modules/admin/admin.controller';
 import { RedisClientProvider } from './config/redis.config';
 
 @Module({
@@ -28,10 +25,10 @@ import { RedisClientProvider } from './config/redis.config';
           service: 'gmail',
           auth: {
             type: 'OAuth2',
-            user: config.get('SMTP_USER'),
-            clientId: config.get('GOOGLE_CLIENT_ID'),
-            clientSecret: config.get('GOOGLE_CLIENT_SECRET'),
-            refreshToken: config.get('GOOGLE_REFRESH_TOKEN')
+            user: config.get<string>('SMTP_USER'),
+            clientId: config.get<string>('GOOGLE_CLIENT_ID'),
+            clientSecret: config.get<string>('GOOGLE_CLIENT_SECRET'),
+            refreshToken: config.get<string>('GOOGLE_REFRESH_TOKEN')
           },
         },
       }),
@@ -42,7 +39,7 @@ import { RedisClientProvider } from './config/redis.config';
     AuthModule,
     ArticleModule,
   ],
-  controllers: [ArticleController, AuthController, AdminController],
   providers: [RedisClientProvider],
+  exports: [RedisClientProvider],
 })
 export class AppModule {}

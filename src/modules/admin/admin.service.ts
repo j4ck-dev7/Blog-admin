@@ -7,10 +7,28 @@ import { AuditService, AuditActionType } from '../audit/audit.service';
 import { hashPassword } from '../../config/argon2.config';
 import speakeasy from 'speakeasy';
 import type { RedisClientType } from 'redis';
-import { AnyBulkWriteOperation } from 'mongoose';
+import type { Invite, User } from '../../../generated/prisma/client';
+import type { SpeakeasyTotpVerifyOptions, SpeakeasySecret } from 'speakeasy';
+import { RequestWithSession } from '../../common/interfaces/request-with-session.interface';
 
 const REDIS_PREFIX = 'admin_invite:';
 const TTL_SECONDS = 60 * 15; // 15 minutes
+
+interface SendInviteResult {
+  inviteId: string;
+  token: string;
+}
+
+interface MfaSecretResult {
+  otpauth_url: string;
+  base32: string;
+}
+
+interface CompleteInviteResult {
+  id: string;
+  name: string;
+  email: string;
+}
 
 @Injectable()
 export class AdminService {
@@ -23,24 +41,26 @@ export class AdminService {
     @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
   ) {}
 
-  async sendInvite(email: string, senderId?: string, senderName?: string, senderEmail?: string) {
-    const invite = await prisma.invite.create({
+  async sendInvite(
+    email: string,
+    senderId?: string | null,
+    senderName?: string | null,
+    senderEmail?: string | null,
+  ): Promise<SendInviteResult> {
+    const invite: Invite = await prisma.invite.create({
       data: {
         email,
-        senderId,
-        senderName,
-        senderEmail,
+        senderId: senderId ?? null,
+        senderName: senderName ?? null,
+        senderEmail: senderEmail ?? null,
       },
     });
 
-    const token = randomUUID();
+    const token: string = randomUUID();
     await this.redis.setEx(`${REDIS_PREFIX}${token}`, TTL_SECONDS, invite.id);
 
-    const appUrl = this.config.get('APP_URL') ?? 'http://localhost:5000';
-    const acceptUrl = `${appUrl.replace(/\/$/, '')}/admin/invite/accept?token=${token}`;
-
-    // For production enforce https-only links. In development we allow http.
-    // const acceptUrl = `https://${host}/admin/invite/accept?token=${token}`;
+    const appUrl: string = this.config.get('APP_URL') ?? 'http://localhost:5000';
+    const acceptUrl: string = `${appUrl.replace(/\/$/, '')}/admin/invite/accept?token=${token}`;
 
     await this.mailer.sendMail({
       to: email,
@@ -62,44 +82,59 @@ export class AdminService {
 
     this.logger.log(`Invite sent to ${email} by ${senderEmail ?? 'unknown'}`);
 
-    return { inviteId: invite.id, token }; // token returned for testing; not stored in DB
+    return { inviteId: invite.id, token };
   }
 
-  async acceptInvite(token: string, name: string, password: string, req?: any) {
-    // This method is superseded by separate MFA setup/complete flow
+  async acceptInvite(
+    token: string,
+    name: string,
+    password: string,
+    req?: RequestWithSession,
+  ): Promise<never> {
     throw new BadRequestException('Use MFA setup/complete endpoints to accept invites');
   }
 
-  async generateMfaSecret(token: string) {
+  async generateMfaSecret(token: string): Promise<MfaSecretResult> {
     const key = `${REDIS_PREFIX}${token}`;
-    const inviteId = await this.redis.get(key);
+    const inviteId: string | null = await this.redis.get(key);
     if (!inviteId) throw new BadRequestException('Invalid or expired invite token');
 
-    const secret = speakeasy.generateSecret({ length: 20, name: `blog-admin:${inviteId}` });
-    // store secret temporarily in redis for the token
+    const secret: SpeakeasySecret = speakeasy.generateSecret({ length: 20, name: `blog-admin:${inviteId}` });
     await this.redis.setEx(`${REDIS_PREFIX}mfa:${token}`, TTL_SECONDS, secret.base32);
 
     return { otpauth_url: secret.otpauth_url, base32: secret.base32 };
   }
 
-  async completeInvite(token: string, name: string, password: string, totp: string, req?: any) {
+  async completeInvite(
+    token: string,
+    name: string,
+    password: string,
+    totp: string,
+    req?: RequestWithSession,
+  ): Promise<CompleteInviteResult> {
     const key = `${REDIS_PREFIX}${token}`;
-    const inviteId = await this.redis.get(key);
+    const inviteId: string | null = await this.redis.get(key);
     if (!inviteId) throw new BadRequestException('Invalid or expired invite token');
 
-    const invite = await prisma.invite.findUnique({ where: { id: inviteId } as any });
+    const invite: Invite | null = await prisma.invite.findUnique({ where: { id: inviteId } });
     if (!invite) throw new BadRequestException('Invite not found');
     if (invite.acceptedAt) throw new BadRequestException('Invite already used');
 
-    const mfaSecret = await this.redis.get(`${REDIS_PREFIX}mfa:${token}`);
+    const mfaSecret: string | null = await this.redis.get(`${REDIS_PREFIX}mfa:${token}`);
     if (!mfaSecret) throw new BadRequestException('MFA not setup or expired');
 
-    const verified = speakeasy.totp.verify({ secret: mfaSecret, encoding: 'base32', token: totp, window: 1 } as any);
+    const verifyOptions: SpeakeasyTotpVerifyOptions = {
+      secret: mfaSecret,
+      encoding: 'base32',
+      token: totp,
+      window: 1,
+    };
+    const verified: boolean = speakeasy.totp.verify(verifyOptions);
     if (!verified) throw new BadRequestException('Invalid MFA code');
 
-    const hashed = await hashPassword(password);
+    const hashed: string = await hashPassword(password);
 
-    const user = await prisma.user.create({
+    const user: User = await prisma.user.create({
       data: {
         name,
         email: invite.email,
@@ -108,11 +143,13 @@ export class AdminService {
         authenticationType: 'local',
         isEmailVerified: true,
         status: 'active',
-        // mfaSecret field omitted – can be set later if needed
       },
     });
 
-    await prisma.invite.update({ where: { id: inviteId } as any, data: { acceptedAt: new Date(), status: 'ACCEPTED' } });
+    await prisma.invite.update({
+      where: { id: inviteId },
+      data: { acceptedAt: new Date(), status: 'ACCEPTED' },
+    });
 
     await this.redis.del(key);
     await this.redis.del(`${REDIS_PREFIX}mfa:${token}`);
@@ -130,14 +167,14 @@ export class AdminService {
     this.logger.log(`Admin account created for ${invite.email} (id=${user.id})`);
 
     try {
-      if (req && req.session) {
+      if (req?.session) {
         req.session.userId = user.id;
         req.session.role = 'admin';
         req.session.email = user.email;
         req.session.name = user.name;
       }
-    } catch (err) {
-      this.logger.error('Failed to create session after invite complete', err);
+    } catch (err: unknown) {
+      this.logger.error('Failed to create session after invite complete', err as Error);
     }
 
     return { id: user.id, name: user.name, email: user.email };

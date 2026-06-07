@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { IAdminRepository } from './admin.repository.interface';
-import { User, Prisma } from '../../../../generated/prisma/client';
+import type { User, Prisma } from '../../../../generated/prisma/client';
 
 @Injectable()
-// implements é usada para garantir que uma classe adote a estrutura definida por uma interface.
-export class adminRepository implements IAdminRepository {
+export class AdminRepository implements IAdminRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: Prisma.UserCreateInput): Promise<User> {

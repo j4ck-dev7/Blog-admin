@@ -10,7 +10,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(AuthRateLimitGuard)
   async login(@Body() body: LoginDto) {
-    const { email, password } = body as any;
+    const { email, password } = body;
     return this.authService.login(email, password);
   }
 

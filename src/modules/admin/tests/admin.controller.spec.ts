@@ -3,6 +3,8 @@ import { AdminController } from '../admin.controller';
 import { AdminService } from '../admin.service';
 import { AdminAuthGuard } from '../../../common/guards/admin-auth.guard';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { SendInviteDto, SetupMfaDto, CompleteInviteDto, AcceptInviteDto } from '../dtos';
+import { RequestWithSession } from '../../../common/interfaces/request-with-session.interface';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 describe('AdminController', () => {
@@ -41,15 +43,15 @@ describe('AdminController', () => {
 
   describe('POST /admin/invite/send', () => {
     it('should call adminService.sendInvite with correct parameters from session', async () => {
-      const mockReq = {
+      const mockReq: RequestWithSession = {
         session: {
           userId: 'admin-123',
           email: 'admin@example.com',
           name: 'Admin User',
         },
-      };
+      } as RequestWithSession;
 
-      const mockBody = { email: 'newadmin@example.com' };
+      const mockBody: SendInviteDto = { email: 'newadmin@example.com' };
       const expectedResult = { inviteId: 'invite-456', token: 'token-789' };
 
       adminService.sendInvite.mockResolvedValue(expectedResult);
@@ -66,8 +68,8 @@ describe('AdminController', () => {
     });
 
     it('should handle missing session data', async () => {
-      const mockReq = { session: null };
-      const mockBody = { email: 'newadmin@example.com' };
+      const mockReq: RequestWithSession = { session: {} } as RequestWithSession;
+      const mockBody: SendInviteDto = { email: 'newadmin@example.com' };
       const expectedResult = { inviteId: 'invite-456', token: 'token-789' };
 
       adminService.sendInvite.mockResolvedValue(expectedResult);
@@ -84,14 +86,13 @@ describe('AdminController', () => {
     });
 
     it('should pass through partial session data', async () => {
-      const mockReq = {
+      const mockReq: RequestWithSession = {
         session: {
           userId: 'admin-123',
           email: 'admin@example.com',
-          // name is missing
         },
-      };
-      const mockBody = { email: 'newadmin@example.com' };
+      } as RequestWithSession;
+      const mockBody: SendInviteDto = { email: 'newadmin@example.com' };
       const expectedResult = { inviteId: 'invite-456', token: 'token-789' };
 
       adminService.sendInvite.mockResolvedValue(expectedResult);
@@ -110,7 +111,7 @@ describe('AdminController', () => {
 
   describe('POST /admin/invite/setup-mfa', () => {
     it('should call adminService.generateMfaSecret with token', async () => {
-      const mockBody = { token: 'valid-token-123' };
+      const mockBody: SetupMfaDto = { token: 'valid-token-123' };
       const expectedResult = {
         otpauth_url: 'otpauth://totp/blog-admin:invite-123?secret=JBSWY3DPEHPK3PXP',
         base32: 'JBSWY3DPEHPK3PXP',
@@ -125,7 +126,7 @@ describe('AdminController', () => {
     });
 
     it('should return MFA secret data', async () => {
-      const mockBody = { token: 'token-456' };
+      const mockBody: SetupMfaDto = { token: 'token-456' };
       const expectedResult = {
         otpauth_url: 'otpauth://totp/blog-admin:invite-789?secret=ABCDEF',
         base32: 'ABCDEF',
@@ -143,10 +144,8 @@ describe('AdminController', () => {
 
   describe('POST /admin/invite/complete', () => {
     it('should call adminService.completeInvite with all parameters', async () => {
-      const mockReq = {
-        session: {},
-      };
-      const mockBody = {
+      const mockReq: RequestWithSession = { session: {} } as RequestWithSession;
+      const mockBody: CompleteInviteDto = {
         token: 'valid-token-123',
         name: 'New Admin',
         password: 'SecurePassword123!',
@@ -173,12 +172,12 @@ describe('AdminController', () => {
     });
 
     it('should pass request object to service', async () => {
-      const mockReq = {
+      const mockReq: RequestWithSession = {
         session: {
           userId: 'existing-user',
         },
-      };
-      const mockBody = {
+      } as RequestWithSession;
+      const mockBody: CompleteInviteDto = {
         token: 'token-123',
         name: 'New Admin',
         password: 'password123',
@@ -202,16 +201,13 @@ describe('AdminController', () => {
 
   describe('POST /admin/invite/accept', () => {
     it('should call adminService.acceptInvite with parameters', async () => {
-      const mockReq = {
-        session: {},
-      };
-      const mockBody = {
+      const mockReq: RequestWithSession = { session: {} } as RequestWithSession;
+      const mockBody: AcceptInviteDto = {
         token: 'valid-token-123',
         name: 'New Admin',
         password: 'SecurePassword123!',
       };
 
-      // acceptInvite throws BadRequestException in the service
       adminService.acceptInvite.mockRejectedValue(
         new BadRequestException('Use MFA setup/complete endpoints to accept invites')
       );
@@ -229,8 +225,8 @@ describe('AdminController', () => {
     });
 
     it('should handle the deprecated endpoint behavior', async () => {
-      const mockReq = {};
-      const mockBody = {
+      const mockReq: RequestWithSession = { session: {} } as RequestWithSession;
+      const mockBody: AcceptInviteDto = {
         token: 'old-token',
         name: 'Legacy Admin',
         password: 'legacy123',
@@ -342,14 +338,14 @@ describe('AdminController - AdminAuthGuard', () => {
 
       // This test verifies the guard is applied to the send endpoint
       // The guard should be tested separately, but here we verify the endpoint works with guard
-      const mockReq = {
+      const mockReq: RequestWithSession = {
         session: {
           userId: 'admin-123',
           email: 'admin@example.com',
           name: 'Admin User',
         },
-      };
-      const mockBody = { email: 'newadmin@example.com' };
+      } as RequestWithSession;
+      const mockBody: SendInviteDto = { email: 'newadmin@example.com' };
       adminService.sendInvite.mockResolvedValue({ inviteId: '123', token: '456' });
 
       await controllerWithGuard.send(mockBody, mockReq);
@@ -359,7 +355,7 @@ describe('AdminController - AdminAuthGuard', () => {
 
     it('should not apply AdminAuthGuard to setup-mfa endpoint', async () => {
       // setup-mfa doesn't have @UseGuards(AdminAuthGuard)
-      const mockBody = { token: 'valid-token' };
+      const mockBody: SetupMfaDto = { token: 'valid-token' };
       const expectedResult = { otpauth_url: 'url', base32: 'secret' };
 
       adminService.generateMfaSecret.mockResolvedValue(expectedResult);
@@ -371,8 +367,8 @@ describe('AdminController - AdminAuthGuard', () => {
     });
 
     it('should not apply AdminAuthGuard to complete endpoint', async () => {
-      const mockReq = { session: {} };
-      const mockBody = {
+      const mockReq: RequestWithSession = { session: {} } as RequestWithSession;
+      const mockBody: CompleteInviteDto = {
         token: 'token-123',
         name: 'New Admin',
         password: 'password123',
@@ -389,8 +385,8 @@ describe('AdminController - AdminAuthGuard', () => {
     });
 
     it('should not apply AdminAuthGuard to accept (POST) endpoint', async () => {
-      const mockReq = { session: {} };
-      const mockBody = {
+      const mockReq: RequestWithSession = { session: {} } as RequestWithSession;
+      const mockBody: AcceptInviteDto = {
         token: 'token-123',
         name: 'New Admin',
         password: 'password123',

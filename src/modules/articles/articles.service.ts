@@ -4,6 +4,16 @@ import type { CreateArticleDto } from './dtos/create-article.dto';
 import type { UpdateArticleDto } from './dtos/update-article.dto';
 import type { ArticleDocument } from './schemas/article.schema';
 
+interface PaginatedResult<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
 @Injectable()
 export class ArticleService {
   private readonly logger = new Logger(ArticleService.name);
@@ -75,7 +85,7 @@ export class ArticleService {
    * @param limit - Itens por página
    * @returns Array de artigos
    */
-  async findAll(page: number = 1, limit: number = 10) {
+  async findAll(page: number = 1, limit: number = 10): Promise<PaginatedResult<ArticleDocument>> {
     this.logger.log(`Listando artigos: página ${page}, limite ${limit}`);
 
     if (page < 1) page = 1;
@@ -104,7 +114,7 @@ export class ArticleService {
    * @param limit - Itens por página
    * @returns Array de artigos e informações de paginação
    */
-  async findByTags(tags: string[], page: number = 1, limit: number = 10) {
+  async findByTags(tags: string[], page: number = 1, limit: number = 10): Promise<PaginatedResult<ArticleDocument>> {
     this.logger.log(`Buscando artigos por tags: ${tags.join(', ')}`);
 
     if (!Array.isArray(tags) || tags.length === 0) {
@@ -137,8 +147,12 @@ export class ArticleService {
    * @param limit - Itens por página
    * @returns Array de artigos e informações de paginação
    */
-  async findByPlanRole(planRole: string, page: number = 1, limit: number = 10) {
-    const validPlans = ['free', 'basic', 'intermediate', 'premium'];
+  async findByPlanRole(
+    planRole: 'free' | 'basic' | 'intermediate' | 'premium',
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginatedResult<ArticleDocument>> {
+    const validPlans: ('free' | 'basic' | 'intermediate' | 'premium')[] = ['free', 'basic', 'intermediate', 'premium'];
     if (!validPlans.includes(planRole)) {
       throw new BadRequestException(
         `Plano inválido. Deve ser um dos: ${validPlans.join(', ')}`,

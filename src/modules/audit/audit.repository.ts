@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { prisma } from '../../config/prisma';
+import type { Audit, Prisma } from '../../../generated/prisma/client';
+import { AuditRecordPayload } from './audit.service';
 
 @Injectable()
 export class AuditRepository {
-  async createAudit(data: any) {
+  async createAudit(data: Prisma.AuditCreateInput): Promise<Audit> {
     return prisma.audit.create({ data });
   }
 
-  async getRecentAudits(limit = 50) {
+  async getRecentAudits(limit: number = 50): Promise<Audit[]> {
     return prisma.audit.findMany({
       orderBy: { createdAt: 'desc' },
       take: limit,

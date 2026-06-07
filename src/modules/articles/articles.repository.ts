@@ -35,9 +35,13 @@ export class ArticleRepository {
       .exec();
   }
 
-  async findByPlanRole(planRole: string, skip: number = 0, limit: number = 10): Promise<ArticleDocument[]> {
+  async findByPlanRole(
+    planRole: 'free' | 'basic' | 'intermediate' | 'premium',
+    skip: number = 0,
+    limit: number = 10,
+  ): Promise<ArticleDocument[]> {
     return this.articleModel
-      .find({ planRole } as any)
+      .find({ planRole })
       .skip(skip)
       .limit(limit)
       .sort({ creationDate: -1 })
