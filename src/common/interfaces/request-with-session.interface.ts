@@ -7,11 +7,14 @@ export interface SessionUser {
   name: string;
 }
 
-export interface RequestWithSession extends Request {
-  session?: {
-    userId?: string;
-    role?: string;
-    email?: string;
-    name?: string;
-  } & Partial<SessionUser>;
+export interface CustomSession {
+  userId?: string;
+  role?: string;
+  email?: string;
+  name?: string;
+  [key: string]: unknown;
 }
+
+export type RequestWithSession = Request & {
+  session?: CustomSession;
+};

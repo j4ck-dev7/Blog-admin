@@ -1,12 +1,18 @@
 import session, { SessionOptions, Store } from 'express-session';
-import connectRedis from 'connect-redis';
 import { createClient, RedisClientType } from 'redis';
 import { ConfigService } from '@nestjs/config';
 
-const RedisStore = connectRedis(session);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const connectRedis = require('connect-redis');
+
+interface RedisStoreConstructor {
+  new (args: { client: RedisClientType; prefix: string; ttl: number }): Store;
+}
+
+const RedisStore: RedisStoreConstructor = connectRedis(session);
 
 export const createSessionOptions = (config: ConfigService): SessionOptions => {
-  const redisUrl: string = config.get('REDIS_URL') ?? 'redis://127.0.0.1:6379';
+  const redisUrl: string = config.get<string>('REDIS_URL') ?? 'redis://127.0.0.1:6379';
   const redisClient: RedisClientType = createClient({ url: redisUrl });
 
   redisClient.on('error', (err: Error) => {
@@ -19,16 +25,16 @@ export const createSessionOptions = (config: ConfigService): SessionOptions => {
 
   return {
     store: new RedisStore({
-      client: redisClient as unknown as RedisClientType,
-      prefix: config.get('REDIS_SESSION_PREFIX', 'sess:'),
+      client: redisClient,
+      prefix: config.get<string>('REDIS_SESSION_PREFIX', 'sess:'),
       ttl: 300,
-    }) as Store,
-    secret: config.get('SESSION_SECRET', 'change-me-in-production'),
+    }),
+    secret: config.get<string>('SESSION_SECRET', 'change-me-in-production'),
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: config.get('NODE_ENV') === 'production',
+      secure: config.get<string>('NODE_ENV') === 'production',
       maxAge: 1000 * 60 * 5,
       sameSite: 'lax',
     },
