@@ -84,7 +84,7 @@ export class ArticleController {
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
   ) {
     this.logger.log(`[GET] Buscando artigos por plano: ${planRole}`);
-    return this.articleService.findByPlanRole(planRole, page, limit);
+    return this.articleService.findByPlanRole(planRole as 'free' | 'basic' | 'intermediate' | 'premium', page, limit);
   }
 
   /**

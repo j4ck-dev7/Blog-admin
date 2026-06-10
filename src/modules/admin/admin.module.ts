@@ -6,11 +6,12 @@ import { AdminController } from './admin.controller';
 import { AdminRepository } from './repositories/admin.repository';
 import { AuditModule } from '../audit/audit.module';
 import { RedisClientProvider } from '../../config/redis.config';
+import { PrismaService } from '../../database/prisma/prisma.service';
 
 @Module({
   imports: [MailerModule, ConfigModule, AuditModule],
   controllers: [AdminController],
-  providers: [AdminService, AdminRepository, RedisClientProvider],
+  providers: [AdminService, AdminRepository, RedisClientProvider, PrismaService],
   exports: [AdminService, AdminRepository, RedisClientProvider],
 })
 export class AdminModule {}

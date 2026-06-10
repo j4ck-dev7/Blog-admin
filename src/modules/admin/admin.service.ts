@@ -8,7 +8,6 @@ import { hashPassword } from '../../config/argon2.config';
 import speakeasy from 'speakeasy';
 import type { RedisClientType } from 'redis';
 import type { Invite, User } from '../../../generated/prisma/client';
-import type { SpeakeasyTotpVerifyOptions, SpeakeasySecret } from 'speakeasy';
 import { RequestWithSession } from '../../common/interfaces/request-with-session.interface';
 
 const REDIS_PREFIX = 'admin_invite:';
@@ -96,10 +95,10 @@ export class AdminService {
 
   async generateMfaSecret(token: string): Promise<MfaSecretResult> {
     const key = `${REDIS_PREFIX}${token}`;
-    const inviteId: string | null = await this.redis.get(key);
+    const inviteId = await this.redis.get(key) as string | null;
     if (!inviteId) throw new BadRequestException('Invalid or expired invite token');
 
-    const secret: SpeakeasySecret = speakeasy.generateSecret({ length: 20, name: `blog-admin:${inviteId}` });
+    const secret = speakeasy.generateSecret({ length: 20, name: `blog-admin:${inviteId}` });
     await this.redis.setEx(`${REDIS_PREFIX}mfa:${token}`, TTL_SECONDS, secret.base32);
 
     return { otpauth_url: secret.otpauth_url, base32: secret.base32 };
@@ -113,19 +112,19 @@ export class AdminService {
     req?: RequestWithSession,
   ): Promise<CompleteInviteResult> {
     const key = `${REDIS_PREFIX}${token}`;
-    const inviteId: string | null = await this.redis.get(key);
+    const inviteId = await this.redis.get(key) as string | null;
     if (!inviteId) throw new BadRequestException('Invalid or expired invite token');
 
     const invite: Invite | null = await prisma.invite.findUnique({ where: { id: inviteId } });
     if (!invite) throw new BadRequestException('Invite not found');
     if (invite.acceptedAt) throw new BadRequestException('Invite already used');
 
-    const mfaSecret: string | null = await this.redis.get(`${REDIS_PREFIX}mfa:${token}`);
+    const mfaSecret = await this.redis.get(`${REDIS_PREFIX}mfa:${token}`) as string | null;
     if (!mfaSecret) throw new BadRequestException('MFA not setup or expired');
 
-    const verifyOptions: SpeakeasyTotpVerifyOptions = {
+    const verifyOptions = {
       secret: mfaSecret,
-      encoding: 'base32',
+      encoding: 'base32' as const,
       token: totp,
       window: 1,
     };

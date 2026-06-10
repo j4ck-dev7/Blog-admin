@@ -12,13 +12,13 @@ export enum AuditActionType {
 
 export interface AuditRecordPayload {
   action: AuditActionType;
-  actorId?: string;
-  actorName?: string;
-  actorEmail?: string;
-  actorRole?: string;
-  targetType?: string;
-  targetId?: string;
-  description?: string;
+  actorId?: string | null;
+  actorName?: string | null;
+  actorEmail?: string | null;
+  actorRole?: string | null;
+  targetType?: string | null;
+  targetId?: string | null;
+  description?: string | null;
   metadata?: unknown;
 }
 
@@ -27,10 +27,19 @@ export class AuditService {
   constructor(private readonly auditRepository: AuditRepository) {}
 
   async record(payload: AuditRecordPayload) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.auditRepository.createAudit({
-      ...payload,
+      action: payload.action,
+      actorId: payload.actorId,
+      actorName: payload.actorName,
+      actorEmail: payload.actorEmail,
+      actorRole: payload.actorRole as any,
+      targetType: payload.targetType,
+      targetId: payload.targetId,
+      description: payload.description,
+      metadata: payload.metadata as any,
       createdAt: new Date(),
-    });
+    } as any);
   }
 
   async listRecent(limit = 50) {

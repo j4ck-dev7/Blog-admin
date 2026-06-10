@@ -1,15 +1,7 @@
-import session, { SessionOptions, Store } from 'express-session';
+import { SessionOptions } from 'express-session';
 import { createClient, RedisClientType } from 'redis';
 import { ConfigService } from '@nestjs/config';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const connectRedis = require('connect-redis');
-
-interface RedisStoreConstructor {
-  new (args: { client: RedisClientType; prefix: string; ttl: number }): Store;
-}
-
-const RedisStore: RedisStoreConstructor = connectRedis(session);
+import RedisStore from 'connect-redis';
 
 export const createSessionOptions = (config: ConfigService): SessionOptions => {
   const redisUrl: string = config.get<string>('REDIS_URL') ?? 'redis://127.0.0.1:6379';
@@ -23,12 +15,14 @@ export const createSessionOptions = (config: ConfigService): SessionOptions => {
     console.error('Failed to connect Redis for session store', error);
   });
 
+  const store = new (RedisStore as any)({
+    client: redisClient,
+    prefix: config.get<string>('REDIS_SESSION_PREFIX', 'sess:'),
+    ttl: 300,
+  });
+
   return {
-    store: new RedisStore({
-      client: redisClient,
-      prefix: config.get<string>('REDIS_SESSION_PREFIX', 'sess:'),
-      ttl: 300,
-    }),
+    store,
     secret: config.get<string>('SESSION_SECRET', 'change-me-in-production'),
     resave: false,
     saveUninitialized: false,

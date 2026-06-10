@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { prisma } from '../../config/prisma';
-import type { Audit, Prisma } from '../../../generated/prisma/client';
+import type { Audit, Prisma } from '../../generated/prisma/client';
 
 @Injectable()
 export class AuditRepository {

@@ -63,7 +63,7 @@ export class TokenService {
       const payload: JwtPayload = jwt.verify(token, refreshSecret) as JwtPayload;
       const jti: string | undefined = payload?.jti as string | undefined;
       if (!jti) return null;
-      const userId: string | null = await this.redis.get(`refresh:${jti}`);
+      const userId = await this.redis.get(`refresh:${jti}`) as string | null;
       if (!userId) return null;
       return { userId, jti, payload: payload as RefreshTokenPayload };
     } catch (err: unknown) {
