@@ -23,9 +23,6 @@ export class Article {
   @Prop({ required: true })
   banner!: string;
 
-  @Prop({ type: [String], required: true, index: true })
-  tags!: string[];
-
   @Prop({
     type: String,
     enum: ['free', 'basic', 'intermediate', 'premium'],
@@ -52,14 +49,12 @@ export const ArticleSchema = SchemaFactory.createForClass(Article);
 ArticleSchema.index(
   {
     title: 'text',
-    tags: 'text',
     content: 'text', // Nota: Mongoose text index em arrays de subdocumentos pode precisar de configuração específica dependendo da versão
   },
   {
     weights: {
       title: 100,
-      tags: 35,
-      content: 10,
+      content: 60,
     },
     name: 'TextIndex',
   }
@@ -67,7 +62,6 @@ ArticleSchema.index(
 
 // Índices compostos
 ArticleSchema.index({ title: 1, creationDate: -1 });
-ArticleSchema.index({ tags: 1, creationDate: -1 });
 
 // Opcional: Adicionar método estático ou instância se necessário
 // ArticleSchema.methods.incrementViews = function() { ... }
