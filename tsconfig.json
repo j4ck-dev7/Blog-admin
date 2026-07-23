@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "types": ["jest", "node"],
+    "types": ["jest", "node", "pg"],
     "module": "nodenext",
     "esModuleInterop": true,
     "declaration": false,
     "removeComments": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
@@ -24,7 +24,6 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitThis": false,
-    "alwaysStrict": false,
     "noImplicitReturns": false,
     "noUncheckedIndexedAccess": false
   },
