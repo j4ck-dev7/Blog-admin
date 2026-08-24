@@ -8,7 +8,7 @@ export const databaseProviders = [
     provide: 'POSTGRES_POOL',
     useFactory: (configService: ConfigService) => {
       const pool = new Pool({
-        database: 'postgres',
+        database: configService.get<string>('POSTGRES_DB'),
         user: configService.get<string>('POSTGRES_USER'),
         password: configService.get<string>('POSTGRES_PASSWORD'),
         port: 5432,
@@ -34,7 +34,9 @@ export const databaseProviders = [
   {
     provide: 'MONGO_CLIENT',
     useFactory: async (configService: ConfigService) => {
-      const client = new MongoClient(configService.get<string>('MONGO_URI'));
+      const client = new MongoClient(
+        configService.get<string>('MONGO_CONNECT'),
+      );
       await client.connect();
       return client;
     },

@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { databaseProviders } from '../database.config';
+import { mongoProvider } from './mongodb.provider';
+import { MongoDbService } from './mongodb.service';
 
 @Module({
-  providers: [
-    ...databaseProviders.filter((p) => p.provide.includes('MONGO_CLIENT')),
-  ],
-  exports: ['MONGO_CLIENT'],
+  providers: [mongoProvider, MongoDbService],
+  exports: [mongoProvider, MongoDbService],
 })
 export class MongoDbModule {}

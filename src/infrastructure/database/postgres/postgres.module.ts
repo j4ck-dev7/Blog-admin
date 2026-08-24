@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { databaseProviders } from '../database.config';
+import { postgresProvider } from './postgres.provider';
+import { PostgresService } from './postgres.service';
 
 @Module({
-  providers: [
-    ...databaseProviders.filter((p) => p.provide.includes('POSTGRES_POOL')),
-  ],
-  exports: ['POSTGRES_POOL'],
+  providers: [postgresProvider, PostgresService],
+  exports: [postgresProvider, PostgresService],
 })
 export class PostgresModule {}
