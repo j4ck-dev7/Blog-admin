@@ -8,23 +8,28 @@ export class adminPostgresRepository implements IAdminRepository {
   private readonly logger = new Logger(adminPostgresRepository.name);
   constructor(@Inject('POSTGRES_POOL') private readonly pool: Pool) {}
 
-  // test code
-  async findById(id: string): Promise<Admin | null> {
-    this.logger.log(`Finding admin by id: ${id}`);
+  async findByEmail(email: string): Promise<Admin | null> {
     const client = await this.pool.connect();
     try {
-      const query = await client.query('SELECT id FROM User WHERE id = $1', [
-        id,
-      ]);
-
-      this.logger.log(
-        `Found admin by id: ${id}, result: ${JSON.stringify(query.rows)}`,
+      const query = await client.query(
+        'SELECT id, password, role FROM "User" WHERE email = $1',
+        [email],
       );
-      return query.rows.length > 0 ? { id: query.rows[0].id } : null;
+
+      if (query.rows.length === 0) {
+        return null;
+      }
+
+      return {
+        id: query.rows[0].id,
+        password: query.rows[0].password,
+        role: query.rows[0].role,
+      };
     } catch (error) {
-      this.logger.error(`Error finding admin by id: ${id}`, error);
-      client.release();
+      this.logger.error(`Error finding admin by email: ${email}`, error);
       throw error;
+    } finally {
+      client.release();
     }
   }
 }

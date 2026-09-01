@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PostgresModule } from './infrastructure/database/postgres/postgres.module';
 import { MongoDbModule } from './infrastructure/database/mongodb/mongodb.module';
 import appConfig from './config/app.config';
@@ -9,20 +7,44 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ArticlesModule } from './modules/articles/articles.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { LikesModule } from './modules/likes/likes.module';
+import { AuditModule } from './modules/audit/audit.module';
 import { UsersModule } from './modules/users/users.module';
+import { RedisClientProvider } from './config/redis.config';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [appConfig] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [appConfig],
+      envFilePath: '.env',
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        transport: {
+          service: 'gmail',
+          auth: {
+            type: 'OAuth2',
+            user: config.get<string>('SMTP_USER'),
+            clientId: config.get<string>('GOOGLE_CLIENT_ID'),
+            clientSecret: config.get<string>('GOOGLE_CLIENT_SECRET'),
+            refreshToken: config.get<string>('GOOGLE_REFRESH_TOKEN'),
+          },
+        },
+      }),
+    }),
     PostgresModule,
     MongoDbModule,
     AuthModule,
     ArticlesModule,
     CommentsModule,
     LikesModule,
+    AuditModule,
     UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [RedisClientProvider],
+  exports: [RedisClientProvider],
 })
 export class AppModule {}
