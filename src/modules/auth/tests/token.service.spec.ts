@@ -26,7 +26,7 @@ describe('TokenService', () => {
   });
 
   it('generatePair should return tokens and store jti in redis', async () => {
-    const pair = await service.generatePair('user-1', 'admin');
+    const pair = await service.generatePair('user-1');
 
     expect(pair).toHaveProperty('accessToken');
     expect(pair).toHaveProperty('refreshToken');
@@ -37,7 +37,7 @@ describe('TokenService', () => {
   it('validateRefreshToken should return payload when token valid and jti exists', async () => {
     mockRedis.get.mockImplementation(() => Promise.resolve('user-1'));
 
-    const pair = await service.generatePair('user-1', 'user');
+    const pair = await service.generatePair('user-1');
     const validated = await service.validateRefreshToken(pair.refreshToken);
 
     expect(validated).toMatchObject({ userId: 'user-1', jti: pair.jti });

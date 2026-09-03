@@ -7,6 +7,7 @@ import { AuthService } from '../src/modules/auth/auth.service';
 import { TokenService } from '../src/modules/auth/token.service';
 import { adminPostgresRepository } from '../src/infrastructure/database/postgres/repositories/admin.repository';
 import { hashPassword } from '../src/config/argon2.config';
+import { AuditService } from '../src/modules/audit/audit.service';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication<App>;
@@ -17,6 +18,9 @@ describe('AuthController (e2e)', () => {
   };
   let repositoryMock: {
     findByEmail: jest.Mock;
+  };
+  let auditServiceMock: {
+    record: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -30,12 +34,17 @@ describe('AuthController (e2e)', () => {
       findByEmail: jest.fn(),
     };
 
+    auditServiceMock = {
+      record: jest.fn(),
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
         AuthService,
         { provide: TokenService, useValue: tokenServiceMock },
         { provide: adminPostgresRepository, useValue: repositoryMock },
+        { provide: AuditService, useValue: auditServiceMock },
         {
           provide: 'REDIS_CLIENT',
           useValue: {
@@ -116,10 +125,14 @@ describe('AuthController (e2e)', () => {
       refreshToken: 'refresh-token',
       admin: {
         id: 'user-1',
-        role: 'admin',
       },
     });
-    expect(tokenServiceMock.generatePair).toHaveBeenCalledWith('user-1', 'admin');
+    expect(tokenServiceMock.generatePair).toHaveBeenCalledWith('user-1');
+    expect(auditServiceMock.record).toHaveBeenCalledWith(
+      'user-1',
+      'ADMIN_LOGIN',
+      'Admin user-1 logged in',
+    );
   });
 
   it('should return success for invalid refresh token on logout', async () => {
@@ -152,6 +165,11 @@ describe('AuthController (e2e)', () => {
     expect(response.body).toEqual({ success: true });
     expect(tokenServiceMock.revokeRefreshByJti).toHaveBeenCalledWith(
       'refresh-jti-123',
+    );
+    expect(auditServiceMock.record).toHaveBeenCalledWith(
+      'user-1',
+      'ADMIN_LOGOUT',
+      'Admin user-1 logged out',
     );
   });
 

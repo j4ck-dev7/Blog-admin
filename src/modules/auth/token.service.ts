@@ -20,7 +20,7 @@ export class TokenService {
     @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
   ) {}
 
-  async generatePair(userId: string, role: string): Promise<TokenPair> {
+  async generatePair(userId: string): Promise<TokenPair> {
     const jti: string = randomUUID();
     const accessSecret: string =
       this.config.get('JWT_ACCESS_SECRET') ||
@@ -32,7 +32,7 @@ export class TokenService {
       'change_me';
 
     const accessToken: string = jwt.sign(
-      { sub: userId, role } as AccessTokenPayload,
+      { sub: userId } as AccessTokenPayload,
       accessSecret,
       { expiresIn: '15m' },
     );

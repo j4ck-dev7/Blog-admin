@@ -14,6 +14,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let mockTokenService: any;
   let mockRepository: any;
+  let mockAuditService: any;
 
   beforeEach(() => {
     mockTokenService = {
@@ -26,7 +27,15 @@ describe('AuthService', () => {
       findByEmail: jest.fn(),
     };
 
-    service = new AuthService(mockTokenService as any, mockRepository as any);
+    mockAuditService = {
+      record: jest.fn(),
+    };
+
+    service = new AuthService(
+      mockTokenService as any,
+      mockRepository as any,
+      mockAuditService as any,
+    );
   });
 
   afterEach(() => {
@@ -66,12 +75,17 @@ describe('AuthService', () => {
     );
 
     const res = await service.login('a@b.com', 'pw');
-    expect(mockTokenService.generatePair).toHaveBeenCalledWith('u1', 'admin');
+    expect(mockTokenService.generatePair).toHaveBeenCalledWith('u1');
+    expect(mockAuditService.record).toHaveBeenCalledWith(
+      'u1',
+      'ADMIN_LOGIN',
+      'Admin u1 logged in',
+    );
     expect(res).toEqual(
       expect.objectContaining({
         accessToken: 'a',
         refreshToken: 'r',
-        admin: { id: 'u1', role: 'admin' },
+        admin: { id: 'u1' },
       }),
     );
   });
@@ -83,6 +97,7 @@ describe('AuthService', () => {
     const res = await service.logout('badtoken');
     expect(res).toEqual({ success: true });
     expect(mockTokenService.revokeRefreshByJti).not.toHaveBeenCalled();
+    expect(mockAuditService.record).not.toHaveBeenCalled();
   });
 
   it('logout revokes jti when token valid', async () => {
@@ -95,6 +110,11 @@ describe('AuthService', () => {
 
     const res = await service.logout('goodtoken');
     expect(mockTokenService.revokeRefreshByJti).toHaveBeenCalledWith('j1');
+    expect(mockAuditService.record).toHaveBeenCalledWith(
+      'u1',
+      'ADMIN_LOGOUT',
+      'Admin u1 logged out',
+    );
     expect(res).toEqual({ success: true });
   });
 });

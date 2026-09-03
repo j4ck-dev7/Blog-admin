@@ -1,24 +1,13 @@
 import { beforeEach, afterEach, describe, expect, it, jest } from '@jest/globals';
+import { AuthController } from '../auth.controller';
 
-// Use a local mirror of the controller to avoid importing DTOs/guards
-class LocalAuthController {
-  constructor(private readonly authService: any) {}
-  async login(body: any) {
-    const { email, password } = body as any;
-    return this.authService.login(email, password);
-  }
-  async logout(refreshToken: string) {
-    return this.authService.logout(refreshToken);
-  }
-}
-
-describe('AuthController (local mirror)', () => {
-  let controller: LocalAuthController;
+describe('AuthController', () => {
+  let controller: AuthController;
   let mockAuthService: any;
 
   beforeEach(() => {
     mockAuthService = { login: jest.fn(), logout: jest.fn() };
-    controller = new LocalAuthController(mockAuthService);
+    controller = new AuthController(mockAuthService);
   });
 
   afterEach(async () => jest.restoreAllMocks());
@@ -27,7 +16,7 @@ describe('AuthController (local mirror)', () => {
     const out = { accessToken: 'a', refreshToken: 'r' };
     mockAuthService.login.mockImplementation(() => Promise.resolve(out));
 
-    const res = await controller.login({ email: 'a@b.com', password: 'pw' });
+    const res = await controller.login({ email: 'a@b.com', password: 'pw' } as any);
     expect(mockAuthService.login).toHaveBeenCalledWith('a@b.com', 'pw');
     expect(res).toEqual(out);
   });
