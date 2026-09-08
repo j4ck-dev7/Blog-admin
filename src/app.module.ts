@@ -5,10 +5,7 @@ import { MongoDbModule } from './infrastructure/database/mongodb/mongodb.module'
 import appConfig from './config/app.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { ArticlesModule } from './modules/articles/articles.module';
-import { CommentsModule } from './modules/comments/comments.module';
-import { LikesModule } from './modules/likes/likes.module';
 import { AuditModule } from './modules/audit/audit.module';
-import { UsersModule } from './modules/users/users.module';
 import { RedisClientProvider } from './config/redis.config';
 import { MailerModule } from '@nestjs-modules/mailer';
 
@@ -39,10 +36,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     MongoDbModule,
     AuthModule,
     ArticlesModule,
-    CommentsModule,
-    LikesModule,
     AuditModule,
-    UsersModule,
   ],
   providers: [RedisClientProvider],
   exports: [RedisClientProvider],
