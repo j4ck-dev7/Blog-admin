@@ -56,4 +56,35 @@ export class adminPostgresRepository implements IAdminRepository {
       client.release();
     }
   }
+
+  async createAdmin(data: {
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+  }): Promise<Admin | null> {
+    const client = await this.pool.connect();
+    try {
+      const query = await client.query(
+        'INSERT INTO "User" (name, email, password, role, "isEmailVerified", status, "createdAt") VALUES ($1, $2, $3, $4, true, $5, NOW()) RETURNING id, name, email, role',
+        [data.name, data.email, data.password, data.role, 'active'],
+      );
+
+      if (query.rows.length === 0) {
+        return null;
+      }
+
+      return {
+        id: query.rows[0].id,
+        name: query.rows[0].name,
+        email: query.rows[0].email,
+        role: query.rows[0].role,
+      };
+    } catch (error) {
+      this.logger.error(`Error creating admin for email: ${data.email}`, error);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
 }

@@ -18,18 +18,33 @@ export class AuditService {
   }
 
   async record(
-    id: string,
+    id: string | null | undefined,
     action: AuditActionType,
     description: string,
   ): Promise<void> {
+    if (!id) {
+      const payload: AuditRecordPayload = {
+        action,
+        actorId: null,
+        actorName: null,
+        actorEmail: null,
+        actorRole: null,
+        description,
+        createdAt: new Date(),
+      };
+
+      await this.auditRepository.createAudit(payload);
+      return;
+    }
+
     const admin = await this.adminRepository.findById(id);
 
     const payload: AuditRecordPayload = {
       action,
       actorId: id,
-      actorName: admin.name,
-      actorEmail: admin.email,
-      actorRole: admin.role,
+      actorName: admin?.name ?? null,
+      actorEmail: admin?.email ?? null,
+      actorRole: admin?.role ?? null,
       description,
       createdAt: new Date(),
     };
