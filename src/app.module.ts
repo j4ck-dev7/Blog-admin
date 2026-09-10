@@ -8,6 +8,7 @@ import { ArticlesModule } from './modules/articles/articles.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { RedisClientProvider } from './config/redis.config';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     AuthModule,
     ArticlesModule,
     AuditModule,
+    AdminModule,
   ],
   providers: [RedisClientProvider],
   exports: [RedisClientProvider],
